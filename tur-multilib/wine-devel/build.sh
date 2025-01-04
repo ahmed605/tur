@@ -8,7 +8,7 @@ _REAL_VERSION="${TERMUX_PKG_VERSION/\~/-}"
 _VERSION_FOLDER="$(test "${_REAL_VERSION:3:1}" = 0 && echo ${_REAL_VERSION:0:4} || echo ${_REAL_VERSION:0:3}x)"
 TERMUX_PKG_SRCURL=https://dl.winehq.org/wine/source/${_VERSION_FOLDER}/wine-$_REAL_VERSION.tar.xz
 TERMUX_PKG_SHA256=fe8a2cdf09fdd4c341a5ec346ac72f0b224de0bdd0a7ae09f911b02e9caf1008
-TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
+TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr, gstreamer, gst-plugins-base"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
 TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, vulkan-loader-generic"
 TERMUX_PKG_NO_STATICSPLIT=true
@@ -40,7 +40,7 @@ exec_prefix=$TERMUX_PREFIX
 --with-gettextpo=no
 --without-gphoto
 --with-gnutls
---without-gstreamer
+--with-gstreamer
 --without-inotify
 --with-krb5
 --with-mingw
@@ -79,12 +79,17 @@ exec_prefix=$TERMUX_PREFIX
 # Enable win64 on 64-bit arches.
 # TODO: Enable win32 after TUR has full support for mutilib
 if [ "$TERMUX_ARCH_BITS" = 64 ]; then
-	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-win64"
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-win64 --enable-win32"
 fi
 
 # Enable new WoW64 support on x86_64.
 if [ "$TERMUX_ARCH" = "x86_64" ]; then
 	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-archs=i386,x86_64"
+fi
+
+# Enable new WoW64 support on AArch64.
+if [ "$TERMUX_ARCH" = "aarch64" ]; then
+	TERMUX_PKG_EXTRA_CONFIGURE_ARGS+=" --enable-archs=aarch64,arm"
 fi
 
 termux_pkg_auto_update() {
